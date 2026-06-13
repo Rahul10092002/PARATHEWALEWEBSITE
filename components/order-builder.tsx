@@ -55,7 +55,7 @@ export function OrderBuilder() {
 
   const summary = useMemo(() => {
     const extrasLabel = selectedExtras.length ? selectedExtras.join(", ") : "No extras";
-    const message = `Hi Paratha Wale, mujhe custom paratha order karna hai.%0A%0ABase: ${base}%0AStuffing: ${stuffing}%0ASpice Level: ${spice}%0AButter: ${butter}%0AExtras: ${extrasLabel}`;
+    const message = `Hi paratha Wale, mujhe custom paratha order karna hai.%0A%0ABase: ${base}%0AStuffing: ${stuffing}%0ASpice Level: ${spice}%0AButter: ${butter}%0AExtras: ${extrasLabel}`;
 
     return {
       extrasLabel,
@@ -130,7 +130,7 @@ export function OrderBuilder() {
           Live Summary
         </p>
         <h3 className="font-heading mt-3 text-2xl font-bold">
-          Tumhara Paratha Ready Hai
+          Tumhara paratha Ready Hai
         </h3>
         <div className="mt-6 space-y-4 text-sm text-white/80">
           <div>

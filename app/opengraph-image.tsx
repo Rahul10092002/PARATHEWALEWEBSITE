@@ -33,11 +33,11 @@ export default function OpenGraphImage() {
             letterSpacing: "0.2em",
           }}
         >
-          <span>PARATHA WALE</span>
+          <span>paratha WALE</span>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
           <div style={{ fontSize: "76px", fontWeight: 800, lineHeight: 1.02 }}>
-            Best Paratha in Indore
+            Best paratha in Indore
           </div>
           <div style={{ fontSize: "34px", opacity: 0.92 }}>
             Fresh stuffed parathas, student thalis, and budget-friendly meals in
