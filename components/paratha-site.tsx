@@ -1279,7 +1279,7 @@ export function ParathaSite() {
                 <div className="mt-6 space-y-4 text-white/85">
                   <p className="flex items-start gap-3">
                     <MapPinned size={18} className="mt-1 shrink-0 text-accent" aria-hidden="true" />
-                    <span>PLOT NO. 1876, SHOP NO. 01, SHRITU APARTMENT SUDAMA NAGAR, Indore, Madhya Pradesh - 452001</span>
+                    <span>PLOT NO. 1876, SHOP NO. 01, SHRUTI APARTMENT SUDAMA NAGAR, Indore, Madhya Pradesh - 452001</span>
                   </p>
                   <p className="flex items-center gap-3">
                     <Clock3 size={18} className="shrink-0 text-accent" aria-hidden="true" />
@@ -1302,7 +1302,7 @@ export function ParathaSite() {
                 </div>
                 <div className="mt-8 flex flex-wrap gap-3">
                   <a
-                    href="https://www.google.com/maps/search/?api=1&query=Parathe%20wale%20Plot%20No.%201876%20Shritu%20Apartment%20Sudama%20Nagar%20Indore"
+                    href="https://www.google.com/maps/search/?api=1&query=Parathe%20wale%20Plot%20No.%201876%20SHRUTI%20Apartment%20Sudama%20Nagar%20Indore"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="rounded-full bg-accent px-5 py-3 text-sm font-bold text-slate-900 hover:bg-accent/90"
@@ -1331,7 +1331,7 @@ export function ParathaSite() {
               >
                 <iframe
                   title="Parathe wale location in Sudama Nagar, Indore on Google Maps"
-                  src="https://www.google.com/maps?q=Plot%20No.%201876%20Shritu%20Apartment%20Sudama%20Nagar%20Indore&output=embed"
+                  src="https://www.google.com/maps?q=Plot%20No.%201876%20SHRUTI%20Apartment%20Sudama%20Nagar%20Indore&output=embed"
                   className="h-full min-h-[420px] w-full"
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
@@ -1555,37 +1555,37 @@ export function ParathaSite() {
           {/* ═══════════════════════════════════════════════
               SECTION 9: FAQ
               ═══════════════════════════════════════════════ */}
-          <section id="faq" aria-labelledby="faq-heading" className="py-18 sm:py-24 bg-slate-50">
+          <section id="faq" aria-labelledby="faq-heading" className="py-12 sm:py-16 bg-slate-50">
             <div className="section-shell">
-              <motion.div {...fadeUp} className="mb-10 max-w-2xl">
-                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">FAQ</p>
-                <h2 id="faq-heading" className="font-heading mt-3 text-3xl font-extrabold text-slate-900 sm:text-4xl">
-                  Jo cheezein log sabse zyada poochte hain
+              <motion.div {...fadeUp} className="mb-8 max-w-2xl">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">FAQ</p>
+                <h2 id="faq-heading" className="font-heading mt-2.5 text-2xl font-extrabold text-slate-900 sm:text-3xl">
+                  Frequently Asked Questions
                 </h2>
               </motion.div>
 
               {/* Semantic details/summary accordion — accessible, no JS required */}
-              <div className="grid gap-4" role="list">
+              <div className="grid gap-3 md:grid-cols-2" role="list">
                 {faqs.map(({ question, answer }, index) => (
                   <motion.details
                     key={question}
                     {...fadeUp}
                     transition={{ delay: index * 0.05, duration: 0.38 }}
-                    className="surface-card group rounded-[24px] bg-white"
+                    className="surface-card group rounded-2xl bg-white"
                     role="listitem"
                   >
                     <summary
-                      className="flex cursor-pointer list-none items-center justify-between gap-4 p-5 focus-visible:outline-primary"
+                      className="flex cursor-pointer list-none items-center justify-between gap-4 p-4 focus-visible:outline-primary"
                       aria-expanded="false"
                     >
-                      <h3 className="font-heading text-base font-bold text-slate-900">{question}</h3>
+                      <h3 className="font-heading text-sm font-bold text-slate-900">{question}</h3>
                       <span className="shrink-0 text-primary" aria-hidden="true">
-                        <ChevronDown size={20} className="group-open:hidden" />
-                        <ChevronUp size={20} className="hidden group-open:block" />
+                        <ChevronDown size={18} className="group-open:hidden" />
+                        <ChevronUp size={18} className="hidden group-open:block" />
                       </span>
                     </summary>
-                    <div className="px-5 pb-5">
-                      <p className="max-w-3xl text-sm leading-7 text-slate-600">{answer}</p>
+                    <div className="px-4 pb-4">
+                      <p className="max-w-3xl text-xs leading-6 text-slate-600">{answer}</p>
                     </div>
                   </motion.details>
                 ))}
@@ -1648,7 +1648,7 @@ export function ParathaSite() {
             <div>
               <p className="font-heading text-sm font-bold uppercase tracking-[0.18em] text-accent">Contact</p>
               <div className="mt-4 space-y-3 text-sm text-white/72">
-                <p>PLOT NO. 1876, SHOP NO. 01,<br />SHRITU APARTMENT SUDAMA NAGAR, Indore</p>
+                <p>PLOT NO. 1876, SHOP NO. 01,<br />SHRUTI APARTMENT SUDAMA NAGAR, Indore</p>
                 <p>
                   <a href={`tel:+${PHONE_NUMBER}`} className="hover:text-white">{PHONE_DISPLAY}</a>
                 </p>

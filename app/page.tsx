@@ -19,7 +19,7 @@ const jsonLd = {
       url: "https://parathawale.example",
       address: {
         "@type": "PostalAddress",
-        streetAddress: "PLOT NO. 1876, SHOP NO. 01, SHRITU APARTMENT SUDAMA NAGAR",
+        streetAddress: "PLOT NO. 1876, SHOP NO. 01, SHRUTI APARTMENT SUDAMA NAGAR",
         addressLocality: "Indore",
         addressRegion: "Madhya Pradesh",
         postalCode: "452001",
@@ -82,7 +82,7 @@ const jsonLd = {
       url: "https://parathawale.example",
       address: {
         "@type": "PostalAddress",
-        streetAddress: "PLOT NO. 1876, SHOP NO. 01, SHRITU APARTMENT SUDAMA NAGAR",
+        streetAddress: "PLOT NO. 1876, SHOP NO. 01, SHRUTI APARTMENT SUDAMA NAGAR",
         addressLocality: "Indore",
         addressRegion: "Madhya Pradesh",
         postalCode: "452001",
