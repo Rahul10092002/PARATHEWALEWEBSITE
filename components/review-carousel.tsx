@@ -66,7 +66,7 @@ export function ReviewCarousel({ reviews }: { reviews: Review[] }) {
     <div className="surface-card rounded-[28px] bg-white p-6 sm:p-8" role="region" aria-label="Customer reviews">
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
-        <div className="flex gap-1 text-accent" aria-label={`${rating} out of 5 stars`}>
+        <div className="flex gap-1 text-accent" role="img" aria-label={`${rating} out of 5 stars`}>
           {Array.from({ length: 5 }).map((_, starIndex) => (
             <Star
               key={starIndex}

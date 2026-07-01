@@ -818,7 +818,7 @@ export function ParathaSite() {
         href={whatsappUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="hidden md:flex fixed bottom-6 right-6 z-50 items-center gap-2 rounded-full bg-[#25d366] px-5 py-3.5 text-sm font-bold text-white shadow-xl hover:bg-[#1ebe5d] hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25d366] focus-visible:ring-offset-2 transition-all"
+        className="hidden md:flex fixed bottom-6 right-6 z-50 items-center gap-2 rounded-full bg-[#128c7e] px-5 py-3.5 text-sm font-bold text-white shadow-xl hover:bg-[#0e6d62] hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#128c7e] focus-visible:ring-offset-2 transition-all"
         aria-label="Order on WhatsApp"
       >
         <MessageCircle size={18} aria-hidden="true" />
@@ -1152,10 +1152,12 @@ export function ParathaSite() {
                         const card = sliderRef.current.children[i] as HTMLElement;
                         card?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
                       }}
-                      className={`rounded-full transition-all ${
+                      className="h-10 w-10 flex items-center justify-center rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    >
+                      <span className={`rounded-full transition-all ${
                         i === activeSlide ? "h-1.5 w-5 bg-primary" : "h-1.5 w-1.5 bg-slate-300 hover:bg-slate-400"
-                      }`}
-                    />
+                      }`} />
+                    </button>
                   ))}
                 </div>
               </div>
@@ -1643,7 +1645,7 @@ export function ParathaSite() {
                       rel="noopener noreferrer"
                       onClick={handleWhatsAppSubmit}
                       className={`mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full py-3 text-sm font-bold text-white transition-all ${
-                        submitState === "loading" ? "bg-[#25d366]/70 cursor-wait" : "bg-[#25d366] hover:bg-[#1ebe5d]"
+                        submitState === "loading" ? "bg-[#128c7e]/70 cursor-wait" : "bg-[#128c7e] hover:bg-[#0e6d62]"
                       }`}
                       aria-disabled={submitState === "loading"}
                     >
@@ -1732,26 +1734,26 @@ export function ParathaSite() {
               {/* Semantic details/summary accordion — accessible, no JS required */}
               <div className="grid gap-3 md:grid-cols-2" role="list">
                 {faqs.map(({ question, answer }, index) => (
-                  <motion.details
-                    key={question}
-                    {...fadeUp}
-                    transition={{ delay: index * 0.05, duration: 0.38 }}
-                    className="surface-card group rounded-2xl bg-white"
-                    role="listitem"
-                  >
-                    <summary
-                      className="flex cursor-pointer list-none items-center justify-between gap-4 p-4 focus-visible:outline-primary"
+                  <div key={question} role="listitem">
+                    <motion.details
+                      {...fadeUp}
+                      transition={{ delay: index * 0.05, duration: 0.38 }}
+                      className="surface-card group rounded-2xl bg-white h-full"
                     >
-                      <h3 className="font-heading text-sm font-bold text-slate-900">{question}</h3>
-                      <span className="shrink-0 text-primary" aria-hidden="true">
-                        <ChevronDown size={18} className="group-open:hidden" />
-                        <ChevronUp size={18} className="hidden group-open:block" />
-                      </span>
-                    </summary>
-                    <div className="px-4 pb-4">
-                      <p className="max-w-3xl text-xs leading-6 text-slate-600">{answer}</p>
-                    </div>
-                  </motion.details>
+                      <summary
+                        className="flex cursor-pointer list-none items-center justify-between gap-4 p-4 focus-visible:outline-primary"
+                      >
+                        <h3 className="font-heading text-sm font-bold text-slate-900">{question}</h3>
+                        <span className="shrink-0 text-primary" aria-hidden="true">
+                          <ChevronDown size={18} className="group-open:hidden" />
+                          <ChevronUp size={18} className="hidden group-open:block" />
+                        </span>
+                      </summary>
+                      <div className="px-4 pb-4">
+                        <p className="max-w-3xl text-xs leading-6 text-slate-600">{answer}</p>
+                      </div>
+                    </motion.details>
+                  </div>
                 ))}
               </div>
             </div>
@@ -1824,7 +1826,7 @@ export function ParathaSite() {
             </div>
           </div>
 
-          <div className="section-shell mt-8 border-t border-white/10 pt-6 text-sm text-white/45">
+          <div className="section-shell mt-8 border-t border-white/10 pt-6 text-sm text-slate-400">
             &copy; 2026 Parathe wale. Indore ka apna comfort food spot.
           </div>
         </footer>
@@ -2108,7 +2110,7 @@ export function ParathaSite() {
                     className={`flex-[1.5] inline-flex items-center justify-center gap-2 rounded-full py-3.5 text-center text-sm font-bold text-white shadow-lg transition-all ${
                       cart.length === 0
                         ? "bg-slate-300 cursor-not-allowed shadow-none"
-                        : "bg-[#25d366] hover:bg-[#1ebe5d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25d366]"
+                        : "bg-[#128c7e] hover:bg-[#0e6d62] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#128c7e]"
                     }`}
                     style={cart.length === 0 ? { pointerEvents: "none" } : undefined}
                   >
