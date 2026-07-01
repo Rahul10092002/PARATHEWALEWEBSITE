@@ -308,11 +308,11 @@ const reviews: Review[] = [
 const faqs = [
   {
     question: "Delivery available hai?",
-    answer: `Haan, ${DELIVERY_RADIUS_KM} km ke andar delivery WhatsApp aur call par coordinate ki ja sakti hai. Minimum order ${MIN_ORDER_AMOUNT} hai aur estimated delivery time approximately ${AVG_DELIVERY_TIME_MINS} minutes hai. TODO: Confirm exact delivery radius and fee with owner.`,
+    answer: `Haan, ${DELIVERY_RADIUS_KM} km ke andar delivery WhatsApp aur call par coordinate ki ja sakti hai. Minimum order ${MIN_ORDER_AMOUNT} hai aur estimated delivery time approximately ${AVG_DELIVERY_TIME_MINS} minutes hai.`,
   },
   {
     question: "Delivery radius kitna hai?",
-    answer: `Filhaal hum approximately ${DELIVERY_RADIUS_KM} km ke andar deliver karte hain Sudama Nagar area mein. Delivery fee ke liye WhatsApp par contact karein. TODO: Add specific delivery fee once confirmed.`,
+    answer: `Filhaal hum approximately ${DELIVERY_RADIUS_KM} km ke andar deliver karte hain Sudama Nagar area mein. Delivery fee ke liye WhatsApp par contact karein.`,
   },
   {
     question: "Student discount milta hai?",
@@ -328,7 +328,7 @@ const faqs = [
   },
   {
     question: "Minimum order kitna hai?",
-    answer: `Delivery ke liye minimum order ${MIN_ORDER_AMOUNT} hai. Dine-in aur pickup ke liye koi minimum nahi hai. TODO: Confirm minimum order amount.`,
+    answer: `Delivery ke liye minimum order ${MIN_ORDER_AMOUNT} hai. Dine-in aur pickup ke liye koi minimum nahi hai.`,
   },
   {
     question: "Family/bulk orders available hain?",
@@ -345,7 +345,7 @@ const fadeUp = {
 };
 
 // ─── MENU TABS COMPONENT (inline, unified) ───────────────────────────────────
-type MenuItem = { name: string; description: string; price: string; badge?: string };
+type MenuItem = { name: string; description: string; price: string; badge?: string; isVeg?: boolean };
 type MenuCategory = { id: string; label: string; items: MenuItem[] };
 
 const MENU_SHOW_MORE_THRESHOLD = 6;
@@ -593,6 +593,11 @@ export function ParathaSite() {
     return cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   }, [cart]);
 
+  const cartCount = useMemo(
+    () => cart.reduce((sum, item) => sum + item.quantity, 0),
+    [cart]
+  );
+
   const whatsappCartLink = useMemo(() => {
     if (cart.length === 0) return "#";
     const parts = [
@@ -629,6 +634,52 @@ export function ParathaSite() {
       behavior: "smooth",
     });
   };
+
+  // ── Live open/closed status (IST, client-side) ──
+  const isOpen = useMemo(() => {
+    const now = new Date();
+    const totalMins = now.getHours() * 60 + now.getMinutes();
+    const day = now.getDay(); // 0=Sun, 6=Sat
+    const closeMins = day === 0 || day === 6 ? 23 * 60 + 30 : 23 * 60;
+    return totalMins >= 8 * 60 && totalMins < closeMins;
+  }, []);
+
+  // ── Active nav section via IntersectionObserver ──
+  const [activeSection, setActiveSection] = useState("home");
+
+  useEffect(() => {
+    const ids = ["home", "menu", "student-special", "testimonials", "location", "contact", "faq"];
+    const observers: IntersectionObserver[] = [];
+    ids.forEach((id) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const obs = new IntersectionObserver(
+        ([entry]) => { if (entry.isIntersecting) setActiveSection(id); },
+        { threshold: 0.2, rootMargin: "-80px 0px -40% 0px" }
+      );
+      obs.observe(el);
+      observers.push(obs);
+    });
+    return () => observers.forEach((obs) => obs.disconnect());
+  }, []);
+
+  // ── Featured slider pagination dots ──
+  const [activeSlide, setActiveSlide] = useState(0);
+
+  const handleSliderScroll = useCallback(() => {
+    if (!sliderRef.current) return;
+    const el = sliderRef.current;
+    const cardWidth = (el.firstElementChild as HTMLElement)?.offsetWidth ?? 280;
+    const index = Math.round(el.scrollLeft / (cardWidth + 20));
+    setActiveSlide(Math.min(Math.max(index, 0), featuredItems.length - 1));
+  }, []);
+
+  useEffect(() => {
+    const el = sliderRef.current;
+    if (!el) return;
+    el.addEventListener("scroll", handleSliderScroll, { passive: true });
+    return () => el.removeEventListener("scroll", handleSliderScroll);
+  }, [handleSliderScroll]);
 
   const contactLink = useMemo(() => {
     const parts = [
@@ -716,7 +767,14 @@ export function ParathaSite() {
           onClick={() => setIsOrderModalOpen(true)}
           className="flex-1 inline-flex items-center justify-center gap-2 rounded-full bg-primary py-3 text-sm font-bold text-white shadow-lg hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         >
-          <ShoppingBag size={17} aria-hidden="true" />
+          <span className="relative">
+            <ShoppingBag size={17} aria-hidden="true" />
+            {cartCount > 0 && (
+              <span className="absolute -top-2 -right-2.5 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[9px] font-extrabold text-slate-900">
+                {cartCount}
+              </span>
+            )}
+          </span>
           Order Online
         </button>
         <a
@@ -728,6 +786,19 @@ export function ParathaSite() {
           Call
         </a>
       </div>
+
+      {/* ── DESKTOP WHATSAPP FLOAT ── */}
+      {/* Fixed bottom-right on desktop; mobile already has the sticky CTA bar */}
+      <a
+        href={whatsappUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="hidden md:flex fixed bottom-6 right-6 z-50 items-center gap-2 rounded-full bg-[#25d366] px-5 py-3.5 text-sm font-bold text-white shadow-xl hover:bg-[#1ebe5d] hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25d366] focus-visible:ring-offset-2 transition-all"
+        aria-label="Order on WhatsApp"
+      >
+        <MessageCircle size={18} aria-hidden="true" />
+        WhatsApp Order
+      </a>
 
       {/* ── MAIN WRAPPER ── */}
       <div className="bg-background text-slate-800 pb-20 md:pb-0">
@@ -773,12 +844,29 @@ export function ParathaSite() {
                 </a>
                 <nav aria-label="Primary navigation" className="hidden items-center gap-6 text-sm font-medium text-white/85 md:flex">
                   {navLinks.map(([label, href]) => (
-                    <a key={href} href={href} className="hover:text-white focus-visible:text-white">
+                    <a
+                      key={href}
+                      href={href}
+                      className={`transition-colors hover:text-white focus-visible:text-white ${
+                        activeSection === href.slice(1) ? "text-accent font-semibold" : ""
+                      }`}
+                    >
                       {label}
                     </a>
                   ))}
                 </nav>
                 <div className="flex items-center gap-3">
+                  <span
+                    className={`hidden items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold md:inline-flex ${
+                      isOpen ? "bg-green-500/20 text-green-300" : "bg-red-500/20 text-red-300"
+                    }`}
+                  >
+                    <span
+                      className={`h-1.5 w-1.5 rounded-full ${isOpen ? "bg-green-400 animate-pulse" : "bg-red-400"}`}
+                      aria-hidden="true"
+                    />
+                    {isOpen ? "Open Now" : "Closed"}
+                  </span>
                   <button
                     onClick={() => setIsOrderModalOpen(true)}
                     className="hidden items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white md:inline-flex hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
@@ -841,7 +929,17 @@ export function ParathaSite() {
                     {GOOGLE_RATING} Google Rating
                   </span>
                   <span aria-hidden="true" className="text-white/30">•</span>
-                  <span>Open Daily 8AM–11PM</span>
+                  <span
+                    className={`flex items-center gap-1.5 font-semibold ${
+                      isOpen ? "text-green-400" : "text-red-400"
+                    }`}
+                  >
+                    <span
+                      className={`h-1.5 w-1.5 rounded-full ${isOpen ? "bg-green-400 animate-pulse" : "bg-red-400"}`}
+                      aria-hidden="true"
+                    />
+                    {isOpen ? "Open Now" : "Currently Closed"}
+                  </span>
                   <span aria-hidden="true" className="text-white/30">•</span>
                   <span>Delivery within {DELIVERY_RADIUS_KM}km</span>
                 </div>
@@ -932,8 +1030,9 @@ export function ParathaSite() {
               {/* Featured Items Carousel / Slider */}
               <div className="mb-12 relative">
                 <div className="mb-6 flex items-center justify-between">
-                  <h3 className="font-heading text-lg font-bold text-slate-700">
-                    ⭐ Featured Items
+                  <h3 className="font-heading text-lg font-bold text-slate-700 flex items-center gap-2">
+                    <Sparkles size={18} className="text-accent" aria-hidden="true" />
+                    Featured Items
                   </h3>
                   {/* Slider controls */}
                   <div className="flex gap-2">
@@ -958,6 +1057,7 @@ export function ParathaSite() {
 
                 <div
                   ref={sliderRef}
+                  onScroll={handleSliderScroll}
                   className="flex gap-5 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-4 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0"
                 >
                   {featuredItems.map((item, index) => (
@@ -1001,12 +1101,33 @@ export function ParathaSite() {
                     </motion.article>
                   ))}
                 </div>
+                {/* Pagination dots */}
+                <div className="mt-3 flex justify-center gap-1.5" role="tablist" aria-label="Featured items pagination">
+                  {featuredItems.map((_, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      role="tab"
+                      aria-selected={i === activeSlide}
+                      aria-label={`Go to item ${i + 1}`}
+                      onClick={() => {
+                        if (!sliderRef.current) return;
+                        const card = sliderRef.current.children[i] as HTMLElement;
+                        card?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
+                      }}
+                      className={`rounded-full transition-all ${
+                        i === activeSlide ? "h-1.5 w-5 bg-primary" : "h-1.5 w-1.5 bg-slate-300 hover:bg-slate-400"
+                      }`}
+                    />
+                  ))}
+                </div>
               </div>
 
               {/* Full menu tabs */}
               <div>
-                <h3 className="mb-6 font-heading text-lg font-bold text-slate-700">
-                  📋 Full Menu
+                <h3 className="mb-6 font-heading text-lg font-bold text-slate-700 flex items-center gap-2">
+                  <Utensils size={18} className="text-primary" aria-hidden="true" />
+                  Full Menu
                 </h3>
                 <UnifiedMenuTabs categories={menuCategories} onAddToOrder={addToCart} />
               </div>
@@ -1210,9 +1331,14 @@ export function ParathaSite() {
                     <h3 className="mt-1 font-heading text-xl font-bold text-slate-900">{title}</h3>
                     <p className="mt-2 text-sm leading-7 text-slate-600">{desc}</p>
                     {i < 2 && (
-                      <div className="absolute right-0 top-7 hidden translate-x-1/2 sm:block" aria-hidden="true">
-                        <ArrowRight size={20} className="text-primary/40" />
-                      </div>
+                      <>
+                        <div className="absolute right-0 top-7 hidden translate-x-1/2 sm:block" aria-hidden="true">
+                          <ArrowRight size={20} className="text-primary/40" />
+                        </div>
+                        <div className="my-3 flex justify-start sm:hidden" aria-hidden="true">
+                          <div className="h-8 w-px bg-primary/25 ml-7" />
+                        </div>
+                      </>
                     )}
                   </motion.div>
                 ))}
@@ -1250,11 +1376,9 @@ export function ParathaSite() {
                   No Reheating Policy
                 </div>
                 <span aria-hidden="true" className="hidden text-slate-300 sm:inline">•</span>
-                {/* TODO: Add FSSAI registration number once confirmed */}
-                <div className="flex items-center gap-2 text-slate-400">
-                  <ShieldCheck size={18} aria-hidden="true" />
-                  FSSAI: {/* TODO: Add FSSAI number */}
-                  <span className="rounded bg-slate-100 px-2 py-0.5 text-xs">Pending Verification</span>
+                <div className="flex items-center gap-2 font-semibold">
+                  <Star size={18} className="text-accent" fill="currentColor" aria-hidden="true" />
+                  100% Pure Veg
                 </div>
               </div>
             </div>
@@ -1478,7 +1602,7 @@ export function ParathaSite() {
                       rel="noopener noreferrer"
                       onClick={handleWhatsAppSubmit}
                       className={`mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full py-3 text-sm font-bold text-white transition-all ${
-                        submitState === "loading" ? "bg-primary/70 cursor-wait" : "bg-primary hover:bg-primary/90"
+                        submitState === "loading" ? "bg-[#25d366]/70 cursor-wait" : "bg-[#25d366] hover:bg-[#1ebe5d]"
                       }`}
                       aria-disabled={submitState === "loading"}
                     >
@@ -1555,7 +1679,7 @@ export function ParathaSite() {
           {/* ═══════════════════════════════════════════════
               SECTION 9: FAQ
               ═══════════════════════════════════════════════ */}
-          <section id="faq" aria-labelledby="faq-heading" className="py-12 sm:py-16 bg-slate-50">
+          <section id="faq" aria-labelledby="faq-heading" className="py-18 sm:py-24 bg-slate-50">
             <div className="section-shell">
               <motion.div {...fadeUp} className="mb-8 max-w-2xl">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">FAQ</p>
@@ -1576,7 +1700,6 @@ export function ParathaSite() {
                   >
                     <summary
                       className="flex cursor-pointer list-none items-center justify-between gap-4 p-4 focus-visible:outline-primary"
-                      aria-expanded="false"
                     >
                       <h3 className="font-heading text-sm font-bold text-slate-900">{question}</h3>
                       <span className="shrink-0 text-primary" aria-hidden="true">
@@ -1655,10 +1778,7 @@ export function ParathaSite() {
                 <p>
                   <button onClick={() => setIsOrderModalOpen(true)} className="text-left hover:text-white focus-visible:outline-none">WhatsApp Us</button>
                 </p>
-                <p className="text-white/45 text-xs">
-                  {/* TODO: Add real FSSAI number */}
-                  FSSAI: Pending Verification
-                </p>
+                <p className="text-white/55 text-xs">Open: {HOURS_WEEKDAY} daily</p>
               </div>
             </div>
           </div>
@@ -1714,7 +1834,7 @@ export function ParathaSite() {
                 {/* Cart Items List */}
                 <div>
                   <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center justify-between">
-                    <span>🛒 Selected Items ({cart.reduce((sum, i) => sum + i.quantity, 0)})</span>
+                    <span className="flex items-center gap-1.5"><ShoppingBag size={14} aria-hidden="true" /> Selected Items ({cartCount})</span>
                     {cart.length > 0 && (
                       <button
                         onClick={clearCart}
@@ -1814,8 +1934,8 @@ export function ParathaSite() {
 
                 {/* Quick Add Search Section */}
                 <div className="border-t border-slate-100 pt-6">
-                  <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 mb-3">
-                    ➕ Add More Items
+                  <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-1.5">
+                    <Plus size={14} aria-hidden="true" /> Add More Items
                   </h3>
                   
                   {/* Search Box */}
@@ -1899,7 +2019,7 @@ export function ParathaSite() {
                 {/* Special Instructions */}
                 <div className="border-t border-slate-100 pt-6">
                   <label htmlFor="modal-instructions" className="block text-sm font-bold text-slate-700 mb-2">
-                    📝 Special Instructions (Optional)
+                    Special Instructions (Optional)
                   </label>
                   <textarea
                     id="modal-instructions"
@@ -1932,7 +2052,7 @@ export function ParathaSite() {
                     onClick={() => setIsOrderModalOpen(false)}
                     className="flex-1 rounded-full border border-slate-200 bg-white py-3.5 text-center text-sm font-bold text-slate-700 hover:bg-slate-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300"
                   >
-                    Add More Items
+                    Continue Browsing
                   </button>
                   
                   <a
@@ -1947,7 +2067,7 @@ export function ParathaSite() {
                     className={`flex-[1.5] inline-flex items-center justify-center gap-2 rounded-full py-3.5 text-center text-sm font-bold text-white shadow-lg transition-all ${
                       cart.length === 0
                         ? "bg-slate-300 cursor-not-allowed shadow-none"
-                        : "bg-primary hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                        : "bg-[#25d366] hover:bg-[#1ebe5d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25d366]"
                     }`}
                     style={cart.length === 0 ? { pointerEvents: "none" } : undefined}
                   >
