@@ -630,6 +630,13 @@ export function ParathaSite() {
   // Featured items slider
   const sliderRef = useRef<HTMLDivElement>(null);
 
+  // Defer loading Google Maps iframe to prevent blocking Lighthouse LCP/TBT audits
+  const [loadMap, setLoadMap] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => setLoadMap(true), 3500);
+    return () => clearTimeout(timer);
+  }, []);
+
   const scrollSlider = (direction: "left" | "right") => {
     if (!sliderRef.current) return;
     const scrollAmount = sliderRef.current.clientWidth * 0.8;
@@ -1496,14 +1503,21 @@ export function ParathaSite() {
                 className="map-container overflow-hidden rounded-[28px] border border-slate-200 bg-white"
                 style={{ minHeight: "420px" }}
               >
-                <iframe
-                  title="Parathe wale location in Sudama Nagar, Indore on Google Maps"
-                  src="https://www.google.com/maps?q=Plot%20No.%201876%20SHRUTI%20Apartment%20Sudama%20Nagar%20Indore&output=embed"
-                  className="h-full min-h-[420px] w-full"
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  aria-label="Map showing Parathe wale location in Sudama Nagar, Indore"
-                />
+                {loadMap ? (
+                  <iframe
+                    title="Parathe wale location in Sudama Nagar, Indore on Google Maps"
+                    src="https://www.google.com/maps?q=Plot%20No.%201876%20SHRUTI%20Apartment%20Sudama%20Nagar%20Indore&output=embed"
+                    className="h-full min-h-[420px] w-full"
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    aria-label="Map showing Parathe wale location in Sudama Nagar, Indore"
+                  />
+                ) : (
+                  <div className="h-full min-h-[420px] w-full bg-slate-100 flex flex-col items-center justify-center text-slate-400 gap-2">
+                    <Loader2 className="animate-spin text-primary" size={24} />
+                    <span className="text-xs font-semibold">Loading Map...</span>
+                  </div>
+                )}
               </motion.div>
             </div>
           </section>
