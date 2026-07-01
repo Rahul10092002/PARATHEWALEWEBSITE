@@ -1,9 +1,24 @@
 import type { Metadata } from "next";
+import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
 
-// TODO: Update metadataBase to real production URL before launch
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
+
+const poppins = Poppins({
+  weight: ["700", "800", "900"],
+  subsets: ["latin"],
+  variable: "--font-heading",
+  display: "swap",
+});
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://parathewalewebsite.vercel.app";
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://parathawale.example"),
+  metadataBase: new URL(siteUrl),
 
   // ── Title & Description ────────────────────────────────────────────────
   title: {
@@ -55,7 +70,7 @@ export const metadata: Metadata = {
     title: "Best paratha in Indore | Parathe wale — Sudama Nagar",
     description:
       "Fresh stuffed parathas, student thalis & budget-friendly meals in Sudama Nagar, Indore. Order on WhatsApp. Open daily 8AM–11PM.",
-    url: "https://parathawale.example",
+    url: siteUrl,
     images: [
       {
         url: "/opengraph-image",
@@ -89,16 +104,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en-IN" className="h-full scroll-smooth antialiased">
-      <head>
-        {/* Google Fonts — Inter + Poppins */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@700;800;900&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className={`${inter.variable} ${poppins.variable} min-h-full flex flex-col`}>
+        {children}
+      </body>
     </html>
   );
 }

@@ -22,8 +22,8 @@
   --color-accent: var(--accent);
   --color-muted: var(--muted);
   --color-border: var(--border);
-  --font-sans: "Inter", "Segoe UI", Arial, sans-serif;
-  --font-heading: "Poppins", "Trebuchet MS", "Segoe UI", sans-serif;
+  --font-sans: var(--font-sans), "Inter", "Segoe UI", Arial, sans-serif;
+  --font-heading: var(--font-heading), "Poppins", "Trebuchet MS", "Segoe UI", sans-serif;
 }
 
 * {
@@ -62,7 +62,7 @@ button {
 }
 
 .font-heading {
-  font-family: "Poppins", "Trebuchet MS", "Segoe UI", Arial, Helvetica, sans-serif;
+  font-family: var(--font-heading), "Poppins", "Trebuchet MS", sans-serif;
 }
 
 .section-shell {

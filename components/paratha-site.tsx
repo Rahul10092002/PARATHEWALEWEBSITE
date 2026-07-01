@@ -68,6 +68,9 @@ const REPEAT_CUSTOMER_RATE = "70%"; // TODO: confirm
 /** Google Rating — TODO: replace with live data */
 const GOOGLE_RATING = "4.8"; // TODO: connect to real Google rating
 
+/** Live Google Maps link for local listing */
+const GOOGLE_MAPS_LINK = "https://www.google.com/maps/search/?api=1&query=Parathe+Wale+Sudama+Nagar+Indore";
+
 // ─── NAV LINKS ───────────────────────────────────────────────────────────────
 /**
  * Navigation links.
@@ -93,6 +96,7 @@ const heroBadges = [
     label: `${GOOGLE_RATING} ★ Rating`,
     sublabel: "Google Reviews", // TODO: replace with verified count
     icon: Star,
+    link: GOOGLE_MAPS_LINK,
   },
   {
     label: "Open Daily",
@@ -635,13 +639,34 @@ export function ParathaSite() {
     });
   };
 
-  // ── Live open/closed status (IST, client-side) ──
   const isOpen = useMemo(() => {
-    const now = new Date();
-    const totalMins = now.getHours() * 60 + now.getMinutes();
-    const day = now.getDay(); // 0=Sun, 6=Sat
-    const closeMins = day === 0 || day === 6 ? 23 * 60 + 30 : 23 * 60;
-    return totalMins >= 8 * 60 && totalMins < closeMins;
+    try {
+      const options = { timeZone: 'Asia/Kolkata', hour12: false };
+      const formatter = new Intl.DateTimeFormat('en-US', {
+        ...options,
+        year: 'numeric', month: 'numeric', day: 'numeric',
+        hour: 'numeric', minute: 'numeric', second: 'numeric',
+        weekday: 'long'
+      });
+      const parts = formatter.formatToParts(new Date());
+      const partMap = Object.fromEntries(parts.map(p => [p.type, p.value]));
+      
+      const hour = parseInt(partMap.hour, 10);
+      const minute = parseInt(partMap.minute, 10);
+      const isWeekend = partMap.weekday === 'Saturday' || partMap.weekday === 'Sunday';
+      
+      const totalMins = hour * 60 + minute;
+      const openMins = 8 * 60; // 8:00 AM
+      const closeMins = isWeekend ? (23 * 60 + 30) : (23 * 60); // 11:30 PM vs 11:00 PM
+      
+      return totalMins >= openMins && totalMins < closeMins;
+    } catch (e) {
+      const now = new Date();
+      const totalMins = now.getHours() * 60 + now.getMinutes();
+      const day = now.getDay();
+      const closeMins = day === 0 || day === 6 ? 23 * 60 + 30 : 23 * 60;
+      return totalMins >= 8 * 60 && totalMins < closeMins;
+    }
   }, []);
 
   // ── Active nav section via IntersectionObserver ──
@@ -775,7 +800,7 @@ export function ParathaSite() {
               </span>
             )}
           </span>
-          Order Online
+          Order via WhatsApp
         </button>
         <a
           href={`tel:${PHONE_NUMBER}`}
@@ -872,7 +897,7 @@ export function ParathaSite() {
                     className="hidden items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white md:inline-flex hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                   >
                     <ShoppingBag size={16} aria-hidden="true" />
-                    Order Online
+                    Order via WhatsApp
                   </button>
                   <MobileNav />
                 </div>
@@ -911,7 +936,7 @@ export function ParathaSite() {
                     className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-7 py-4 text-sm font-bold text-white shadow-lg hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none"
                   >
                     <ShoppingBag size={18} aria-hidden="true" />
-                    Order Online
+                    Order via WhatsApp
                   </button>
                   <a
                     href="#menu"
@@ -924,22 +949,17 @@ export function ParathaSite() {
 
                 {/* Social proof strip */}
                 <div className="mt-8 flex flex-wrap items-center gap-3 text-sm text-white/72">
-                  <span className="flex items-center gap-1.5">
+                  <a
+                    href={GOOGLE_MAPS_LINK}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 hover:text-white hover:underline transition-colors"
+                  >
                     <Star size={14} className="text-accent" fill="currentColor" aria-hidden="true" />
                     {GOOGLE_RATING} Google Rating
-                  </span>
+                  </a>
                   <span aria-hidden="true" className="text-white/30">•</span>
-                  <span
-                    className={`flex items-center gap-1.5 font-semibold ${
-                      isOpen ? "text-green-400" : "text-red-400"
-                    }`}
-                  >
-                    <span
-                      className={`h-1.5 w-1.5 rounded-full ${isOpen ? "bg-green-400 animate-pulse" : "bg-red-400"}`}
-                      aria-hidden="true"
-                    />
-                    {isOpen ? "Open Now" : "Currently Closed"}
-                  </span>
+                  <span>Open Daily 8AM–11PM (11:30PM Weekends)</span>
                   <span aria-hidden="true" className="text-white/30">•</span>
                   <span>Delivery within {DELIVERY_RADIUS_KM}km</span>
                 </div>
@@ -953,16 +973,33 @@ export function ParathaSite() {
                 className="grid gap-3 sm:grid-cols-2"
                 aria-label="Quick info badges"
               >
-                {heroBadges.map(({ label, sublabel, icon: Icon }) => (
-                  <div
-                    key={label}
-                    className="rounded-2xl border border-white/15 bg-white/10 p-4 text-white backdrop-blur-md"
-                  >
-                    <Icon size={18} className="text-accent" aria-hidden="true" />
-                    <p className="mt-3 text-sm font-semibold">{label}</p>
-                    <p className="mt-0.5 text-xs text-white/65">{sublabel}</p>
-                  </div>
-                ))}
+                {heroBadges.map(({ label, sublabel, icon: Icon, link }) => {
+                  const content = (
+                    <>
+                      <Icon size={18} className="text-accent" aria-hidden="true" />
+                      <p className="mt-3 text-sm font-semibold">{label}</p>
+                      <p className="mt-0.5 text-xs text-white/65">{sublabel}</p>
+                    </>
+                  );
+                  return link ? (
+                    <a
+                      key={label}
+                      href={link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block rounded-2xl border border-white/15 bg-white/10 p-4 text-white backdrop-blur-md hover:bg-white/15 hover:border-white/25 transition-all"
+                    >
+                      {content}
+                    </a>
+                  ) : (
+                    <div
+                      key={label}
+                      className="rounded-2xl border border-white/15 bg-white/10 p-4 text-white backdrop-blur-md"
+                    >
+                      {content}
+                    </div>
+                  );
+                })}
               </motion.div>
             </div>
           </div>
@@ -1023,7 +1060,7 @@ export function ParathaSite() {
                   className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900"
                 >
                   <ShoppingBag size={17} aria-hidden="true" />
-                  Quick Order
+                  WhatsApp Order
                 </button>
               </motion.div>
 
@@ -1241,11 +1278,15 @@ export function ParathaSite() {
                 </p>
                 {/* Trust badges */}
                 <div className="mt-6 flex flex-wrap gap-3">
-                  <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700">
+                  <a
+                    href={GOOGLE_MAPS_LINK}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:border-slate-400 hover:bg-slate-50 transition-colors"
+                  >
                     <Star size={14} className="text-accent" fill="currentColor" aria-hidden="true" />
                     {GOOGLE_RATING} on Google
-                    {/* TODO: Add link to real Google Business listing */}
-                  </div>
+                  </a>
                   {/* TODO: Add FSSAI badge once registration number is confirmed */}
                   {/* <div className="flex items-center gap-2 rounded-full border border-green-200 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700">
                     <ShieldCheck size={14} aria-hidden="true" />
@@ -1349,7 +1390,7 @@ export function ParathaSite() {
                   className="inline-flex items-center gap-2 rounded-full bg-primary px-8 py-3.5 text-sm font-bold text-white shadow-lg hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 >
                   <ShoppingBag size={18} aria-hidden="true" />
-                  Order Online Now
+                  Order on WhatsApp
                 </button>
               </div>
             </div>
@@ -1403,7 +1444,7 @@ export function ParathaSite() {
                 <div className="mt-6 space-y-4 text-white/85">
                   <p className="flex items-start gap-3">
                     <MapPinned size={18} className="mt-1 shrink-0 text-accent" aria-hidden="true" />
-                    <span>PLOT NO. 1876, SHOP NO. 01, SHRUTI APARTMENT SUDAMA NAGAR, Indore, Madhya Pradesh - 452001</span>
+                    <span>Shop No .1, Shruti Apartment, near Lucky Bakers, Sector D, Sudama Nagar, Indore, Madhya Pradesh - 452009</span>
                   </p>
                   <p className="flex items-center gap-3">
                     <Clock3 size={18} className="shrink-0 text-accent" aria-hidden="true" />
@@ -1426,7 +1467,7 @@ export function ParathaSite() {
                 </div>
                 <div className="mt-8 flex flex-wrap gap-3">
                   <a
-                    href="https://www.google.com/maps/search/?api=1&query=Parathe%20wale%20Plot%20No.%201876%20SHRUTI%20Apartment%20Sudama%20Nagar%20Indore"
+                    href="https://www.google.com/maps/place/Parathewale/@22.6834069,75.8362,15z"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="rounded-full bg-accent px-5 py-3 text-sm font-bold text-slate-900 hover:bg-accent/90"
@@ -1443,7 +1484,7 @@ export function ParathaSite() {
                     onClick={() => setIsOrderModalOpen(true)}
                     className="rounded-full border border-white/25 px-5 py-3 text-sm font-semibold text-white hover:border-white/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
                   >
-                    Order Online
+                    Order via WhatsApp
                   </button>
                 </div>
               </motion.div>
@@ -1732,7 +1773,7 @@ export function ParathaSite() {
                   className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-white hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 >
                   <ShoppingBag size={14} aria-hidden="true" />
-                  Order Online
+                  Order via WhatsApp
                 </button>
                 <a
                   href={`tel:+${PHONE_NUMBER}`}
@@ -1763,7 +1804,7 @@ export function ParathaSite() {
                 {/* Disabled based on landing page audit recommendation.
                     Reason: #customize anchor does not exist — OrderBuilder section is commented out. */}
                 {/* <a href="#customize">Customize Order</a> */}
-                <button onClick={() => setIsOrderModalOpen(true)} className="text-left hover:text-white focus-visible:outline-none">Order Online</button>
+                <button onClick={() => setIsOrderModalOpen(true)} className="text-left hover:text-white focus-visible:outline-none">Order via WhatsApp</button>
                 <a href="#faq" className="hover:text-white">FAQ</a>
               </div>
             </nav>
@@ -1771,7 +1812,7 @@ export function ParathaSite() {
             <div>
               <p className="font-heading text-sm font-bold uppercase tracking-[0.18em] text-accent">Contact</p>
               <div className="mt-4 space-y-3 text-sm text-white/72">
-                <p>PLOT NO. 1876, SHOP NO. 01,<br />SHRUTI APARTMENT SUDAMA NAGAR, Indore</p>
+                <p>Shop No .1, Shruti Apartment, near Lucky Bakers,<br />Sector D, Sudama Nagar, Indore - 452009</p>
                 <p>
                   <a href={`tel:+${PHONE_NUMBER}`} className="hover:text-white">{PHONE_DISPLAY}</a>
                 </p>
